@@ -47,7 +47,10 @@ export function StoryInput({ onSubmit, isLoading = false }: StoryInputProps) {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center">Story Bringer</h1>
+      <h1 className="text-3xl font-bold mb-2 text-center">Story Bringer</h1>
+      <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
+        {t('storyInput.description', language)}
+      </p>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="storyLine" className="block text-sm font-medium mb-2">

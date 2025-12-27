@@ -17,6 +17,7 @@ type TranslationKey =
   | 'settings.language.en'
   | 'settings.language.ja'
   | 'storyInput.title'
+  | 'storyInput.description'
   | 'storyInput.submit'
   | 'storyInput.storyLine'
   | 'storyInput.storyLine.placeholder'
@@ -99,6 +100,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'settings.language.en': '영어',
     'settings.language.ja': '일본어',
     'storyInput.title': '스토리 입력',
+    'storyInput.description': 'GPT와 Gemini의 최신 기능을 활용한 그래픽 노블 작성 도구',
     'storyInput.submit': '스토리 생성하기',
     'storyInput.storyLine': '스토리 라인',
     'storyInput.storyLine.placeholder': '스토리의 주요 내용을 입력해주세요...',
@@ -180,6 +182,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'settings.language.en': 'English',
     'settings.language.ja': 'Japanese',
     'storyInput.title': 'Story Input',
+    'storyInput.description': 'A graphic novel creation tool utilizing the latest features of GPT and Gemini',
     'storyInput.submit': 'Generate Story',
     'storyInput.storyLine': 'Story Line',
     'storyInput.storyLine.placeholder': 'Please enter the main content of the story...',
@@ -261,6 +264,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'settings.language.en': '英語',
     'settings.language.ja': '日本語',
     'storyInput.title': 'ストーリー入力',
+    'storyInput.description': 'GPTとGeminiの最新機能を活用したグラフィックノベル作成ツール',
     'storyInput.submit': 'ストーリー生成',
     'storyInput.storyLine': 'ストーリーライン',
     'storyInput.storyLine.placeholder': 'ストーリーの主要内容を入力してください...',
