@@ -2,6 +2,8 @@ import { useState, useCallback, useMemo } from 'react';
 import type { Story, Image } from '../../types/story';
 import { useImageGeneration } from '../../hooks/useImageGeneration';
 import { getRemainingGenerationCount, getDailyLimit } from '../../utils/imageGenerationLimit';
+import { useApp } from '../../contexts/AppContext';
+import { t } from '../../utils/i18n';
 
 interface ImageGeneratorProps {
   story: Story;
@@ -16,6 +18,7 @@ export function ImageGenerator({
   onImageUpdate,
   onCoverSelected,
 }: ImageGeneratorProps) {
+  const { language } = useApp();
   const { generateSingleImage, regenerateImage, isGenerating, error } = useImageGeneration();
   const [generatingTextIndex, setGeneratingTextIndex] = useState<number | null>(null);
   const [selectedTextIndex, setSelectedTextIndex] = useState<number | null>(null);
@@ -171,10 +174,10 @@ export function ImageGenerator({
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">이미지 생성</h2>
+        <h2 className="text-2xl font-bold">{t('imageGenerator.title', language)}</h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium text-gray-600">남은 생성 횟수:</span>
+            <span className="font-medium text-gray-600">{t('imageGenerator.remainingCount', language)}</span>
             <span className={`px-3 py-1 rounded-full font-semibold ${
               remainingCount > 0
                 ? 'bg-green-100 text-green-800'
@@ -184,7 +187,7 @@ export function ImageGenerator({
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="font-medium">사용 모델:</span>
+            <span className="font-medium">{t('imageGenerator.model', language)}</span>
             <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-semibold">
               {modelDisplayName}
             </span>
@@ -203,7 +206,7 @@ export function ImageGenerator({
       <div className="grid grid-cols-2 gap-6">
         {/* 좌측: 이미지 목록 */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">이미지 목록 (1:1 비율)</h3>
+          <h3 className="text-lg font-semibold">{t('imageGenerator.imageList', language)}</h3>
           <div className="grid grid-cols-2 gap-4">
             {storyTexts.map((_, index) => {
               const image = story.images.find(img => img.textIndex === index);
@@ -216,6 +219,7 @@ export function ImageGenerator({
                   index={index}
                   isGenerating={isGenerating}
                   isCover={image?.isCover || false}
+                  language={language}
                   onRegenerate={image ? () => handleRegenerateImage(image.id, index) : undefined}
                   onSelectCover={image ? () => handleCoverSelect(image.id) : undefined}
                 />
@@ -226,7 +230,7 @@ export function ImageGenerator({
 
         {/* 우측: 텍스트 목록 */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">스토리 텍스트 목록 ({storyTexts.length}개)</h3>
+          <h3 className="text-lg font-semibold">{t('imageGenerator.textList', language)} ({storyTexts.length})</h3>
           <div className="space-y-2 max-h-[600px] overflow-y-auto">
             {storyTexts.map((storyText, index) => {
               const image = story.images.find(img => img.textIndex === index);
@@ -242,6 +246,7 @@ export function ImageGenerator({
                   hasImage={!!image}
                   isSelected={isSelected}
                   isGenerating={isGenerating}
+                  language={language}
                   onClick={() => handleTextSelect(index)}
                 />
               );
@@ -258,11 +263,12 @@ interface ImageCardProps {
   index: number;
   isGenerating: boolean;
   isCover: boolean;
+  language: 'ko' | 'en' | 'ja';
   onRegenerate?: () => void;
   onSelectCover?: () => void;
 }
 
-function ImageCard({ image, index, isGenerating, isCover, onRegenerate, onSelectCover }: ImageCardProps) {
+function ImageCard({ image, index, isGenerating, isCover, language, onRegenerate, onSelectCover }: ImageCardProps) {
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden relative">
       <div className="aspect-square bg-gray-100 relative">
@@ -270,7 +276,7 @@ function ImageCard({ image, index, isGenerating, isCover, onRegenerate, onSelect
           <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2" />
-              <p className="text-sm text-gray-600">생성 중...</p>
+              <p className="text-sm text-gray-600">{t('imageGenerator.generating', language)}</p>
             </div>
           </div>
         ) : image ? (
@@ -287,15 +293,15 @@ function ImageCard({ image, index, isGenerating, isCover, onRegenerate, onSelect
             />
             {isCover && (
               <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded font-semibold">
-                표지
+                {t('preview.cover', language)}
               </div>
             )}
           </>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-gray-400">
             <div className="text-center">
-              <p className="text-sm">이미지 없음</p>
-              <p className="text-xs mt-1">텍스트 선택</p>
+              <p className="text-sm">{t('imageGenerator.noImage', language)}</p>
+              <p className="text-xs mt-1">{t('imageGenerator.selectText', language)}</p>
             </div>
           </div>
         )}
@@ -309,7 +315,7 @@ function ImageCard({ image, index, isGenerating, isCover, onRegenerate, onSelect
                 onClick={onSelectCover}
                 className="flex-1 bg-yellow-500 text-white text-xs px-2 py-1 rounded hover:bg-yellow-600"
               >
-                표지 선택
+                {t('imageGenerator.selectCover', language)}
               </button>
             )}
             {onRegenerate && (
@@ -317,7 +323,7 @@ function ImageCard({ image, index, isGenerating, isCover, onRegenerate, onSelect
                 onClick={onRegenerate}
                 className="flex-1 bg-blue-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700"
               >
-                재생성
+                {t('imageGenerator.regenerate', language)}
               </button>
             )}
           </div>
@@ -334,10 +340,11 @@ interface TextItemProps {
   hasImage: boolean;
   isSelected: boolean;
   isGenerating: boolean;
+  language: 'ko' | 'en' | 'ja';
   onClick: () => void;
 }
 
-function TextItem({ index: _index, title, text, hasImage, isSelected, isGenerating, onClick }: TextItemProps) {
+function TextItem({ index: _index, title, text, hasImage, isSelected, isGenerating, language, onClick }: TextItemProps) {
   return (
     <div
       onClick={onClick}
@@ -353,7 +360,7 @@ function TextItem({ index: _index, title, text, hasImage, isSelected, isGenerati
         <h4 className="font-semibold text-sm">{title}</h4>
         <div className="flex items-center gap-2">
           {hasImage && (
-            <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">이미지 생성됨</span>
+            <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">{t('imageGenerator.imageGenerated', language)}</span>
           )}
           {isGenerating && (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
@@ -361,7 +368,7 @@ function TextItem({ index: _index, title, text, hasImage, isSelected, isGenerati
         </div>
       </div>
       <p className="text-sm text-gray-700 line-clamp-3">{text}</p>
-      <p className="text-xs text-gray-500 mt-2">클릭하여 이미지 생성</p>
+      <p className="text-xs text-gray-500 mt-2">{t('imageGenerator.selectText', language)}</p>
     </div>
   );
 }

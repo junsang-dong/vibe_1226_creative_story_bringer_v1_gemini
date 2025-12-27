@@ -1,18 +1,21 @@
 import { useState, useCallback, useRef } from 'react';
+import type { Language } from '../../contexts/AppContext';
+import { t } from '../../utils/i18n';
 
 interface FileUploadProps {
   onFileUpload: (text: string) => void;
   uploadedText: string;
+  language: Language;
 }
 
-export function FileUpload({ onFileUpload, uploadedText }: FileUploadProps) {
+export function FileUpload({ onFileUpload, uploadedText, language }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = useCallback(
+      const handleFile = useCallback(
     (file: File) => {
       if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
-        alert('텍스트 파일(.txt)만 업로드 가능합니다.');
+        alert(t('storyInput.fileUpload.error', language));
         return;
       }
 
@@ -22,11 +25,11 @@ export function FileUpload({ onFileUpload, uploadedText }: FileUploadProps) {
         onFileUpload(text);
       };
       reader.onerror = () => {
-        alert('파일 읽기 중 오류가 발생했습니다.');
+        alert(t('storyInput.fileUpload.readError', language));
       };
       reader.readAsText(file);
     },
-    [onFileUpload]
+    [onFileUpload, language]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -67,7 +70,7 @@ export function FileUpload({ onFileUpload, uploadedText }: FileUploadProps) {
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-2">텍스트 파일 업로드 (선택)</label>
+      <label className="block text-sm font-medium mb-2">{t('storyInput.fileUpload', language)}</label>
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -88,12 +91,12 @@ export function FileUpload({ onFileUpload, uploadedText }: FileUploadProps) {
         />
         <p className="text-gray-600">
           {uploadedText
-            ? '파일이 업로드되었습니다. 클릭하여 다른 파일로 변경할 수 있습니다.'
-            : '텍스트 파일을 드래그 앤 드롭하거나 클릭하여 업로드하세요'}
+            ? t('storyInput.fileUpload.uploaded', language)
+            : t('storyInput.fileUpload.dragDrop', language)}
         </p>
         {uploadedText && (
           <p className="mt-2 text-sm text-gray-500">
-            업로드된 텍스트 길이: {uploadedText.length}자
+            {t('storyInput.fileUpload.length', language)} {uploadedText.length}
           </p>
         )}
       </div>

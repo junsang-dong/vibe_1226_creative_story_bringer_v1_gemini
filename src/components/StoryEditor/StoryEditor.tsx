@@ -49,7 +49,7 @@ export function StoryEditor({
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">스토리 편집</h2>
+      <h2 className="text-2xl font-bold mb-6">{t('storyEditor.title', language)}</h2>
 
       {/* 이미지 생성 가이드 섹션 */}
       <div className="mb-8 border border-gray-300 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">

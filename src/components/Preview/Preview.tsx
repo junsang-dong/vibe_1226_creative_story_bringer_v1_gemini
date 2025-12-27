@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Story, Image } from '../../types/story';
+import { useApp } from '../../contexts/AppContext';
+import { t } from '../../utils/i18n';
 
 interface PreviewProps {
   story: Story;
@@ -7,6 +9,7 @@ interface PreviewProps {
 }
 
 export function Preview({ story, onClose }: PreviewProps) {
+  const { language } = useApp();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -138,14 +141,14 @@ export function Preview({ story, onClose }: PreviewProps) {
           onClick={() => setIsFullscreen(!isFullscreen)}
           className="bg-black/50 text-white px-4 py-2 rounded hover:bg-black/70"
         >
-          {isFullscreen ? '나가기' : '전체화면'}
+          {isFullscreen ? t('preview.exit', language) : t('preview.fullscreen', language)}
         </button>
         {onClose && (
           <button
             onClick={onClose}
             className="bg-black/50 text-white px-4 py-2 rounded hover:bg-black/70"
           >
-            닫기
+            {t('preview.close', language)}
           </button>
         )}
       </div>
@@ -157,6 +160,7 @@ export function Preview({ story, onClose }: PreviewProps) {
         content={currentTextData.content}
         chapterNumber={currentTextData.chapterNumber}
         isCover={currentImage?.isCover || false}
+        language={language}
       />
 
       {/* 네비게이션 버튼 */}
@@ -167,7 +171,7 @@ export function Preview({ story, onClose }: PreviewProps) {
             disabled={currentIndex === 0}
             className="text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20"
           >
-            이전
+            {t('preview.prev', language)}
           </button>
           <span className="text-white text-sm">
             {currentIndex + 1} / {totalPages}
@@ -177,7 +181,7 @@ export function Preview({ story, onClose }: PreviewProps) {
             disabled={currentIndex === totalPages - 1}
             className="text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20"
           >
-            다음
+            {t('preview.next', language)}
           </button>
         </div>
       )}
@@ -191,9 +195,10 @@ interface DesktopViewProps {
   content: string;
   chapterNumber: number | null;
   isCover: boolean;
+  language: 'ko' | 'en' | 'ja';
 }
 
-function DesktopView({ image, title, content, chapterNumber, isCover }: DesktopViewProps) {
+function DesktopView({ image, title, content, chapterNumber, isCover, language }: DesktopViewProps) {
   return (
     <div className="h-full w-full flex" style={{ aspectRatio: '16/9' }}>
       {/* 좌측: 이미지 */}
@@ -214,7 +219,7 @@ function DesktopView({ image, title, content, chapterNumber, isCover }: DesktopV
       {/* 우측: 텍스트 */}
       <div className="w-1/2 bg-gray-800 text-white p-6 sm:p-8 overflow-y-auto flex-shrink-0">
         <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
-          {isCover ? '표지' : chapterNumber !== null ? `스토리 #${chapterNumber}` : '스토리'}
+          {isCover ? t('preview.cover', language) : chapterNumber !== null ? `${t('preview.storyNumber', language)}${chapterNumber}` : t('preview.story', language)}
         </h3>
         {title && (
           <h4 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 leading-tight">

@@ -18,6 +18,25 @@ type TranslationKey =
   | 'settings.language.ja'
   | 'storyInput.title'
   | 'storyInput.submit'
+  | 'storyInput.storyLine'
+  | 'storyInput.storyLine.placeholder'
+  | 'storyInput.characters'
+  | 'storyInput.characters.placeholder'
+  | 'storyInput.similarWorks'
+  | 'storyInput.similarWorks.placeholder'
+  | 'storyInput.genre'
+  | 'storyInput.designStyle'
+  | 'storyInput.artist'
+  | 'storyInput.artist.placeholder'
+  | 'storyInput.director'
+  | 'storyInput.director.placeholder'
+  | 'storyInput.generating'
+  | 'storyInput.fileUpload'
+  | 'storyInput.fileUpload.dragDrop'
+  | 'storyInput.fileUpload.uploaded'
+  | 'storyInput.fileUpload.length'
+  | 'storyInput.fileUpload.error'
+  | 'storyInput.fileUpload.readError'
   | 'titleRecommender.title'
   | 'titleRecommender.generate'
   | 'titleRecommender.select'
@@ -46,9 +65,18 @@ type TranslationKey =
   | 'footer.education'
   | 'footer.techStack'
   | 'footer.developer'
+  | 'storyEditor.title'
   | 'storyEditor.imageGenerationGuide'
   | 'storyEditor.imageGenerationGuide.placeholder'
   | 'storyEditor.imageGenerationGuide.example'
+  | 'titleRecommender.currentTitle'
+  | 'titleRecommender.selected'
+  | 'titleRecommender.editing'
+  | 'titleRecommender.prompt'
+  | 'imageGenerator.remainingCount'
+  | 'imageGenerator.model'
+  | 'imageGenerator.imageGenerated'
+  | 'preview.storyNumber'
   | 'common.loading'
   | 'common.error'
   | 'common.success';
@@ -72,6 +100,26 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'settings.language.ja': '일본어',
     'storyInput.title': '스토리 입력',
     'storyInput.submit': '스토리 생성하기',
+    'storyInput.storyLine': '스토리 라인',
+    'storyInput.storyLine.placeholder': '스토리의 주요 내용을 입력해주세요...',
+    'storyInput.characters': '등장 인물',
+    'storyInput.characters.placeholder': '주요 등장 인물과 그들의 특징을 설명해주세요...',
+    'storyInput.similarWorks': '비슷한 작품',
+    'storyInput.similarWorks.placeholder': '참고하고 싶은 작품이나 스타일을 입력해주세요...',
+    'storyInput.genre': '장르',
+    'storyInput.designStyle': '디자인 스타일',
+    'storyInput.artist': '아티스트 (선택)',
+    'storyInput.artist.placeholder': '참고하고 싶은 아티스트 스타일...',
+    'storyInput.director': '디렉터 (선택)',
+    'storyInput.director.placeholder': '참고하고 싶은 디렉터 스타일...',
+    'storyInput.generating': '스토리 생성 중...',
+    'storyInput.fileUpload': '텍스트 파일 업로드 (선택)',
+    'storyInput.fileUpload.dragDrop': '텍스트 파일을 드래그 앤 드롭하거나 클릭하여 업로드하세요',
+    'storyInput.fileUpload.uploaded': '파일이 업로드되었습니다. 클릭하여 다른 파일로 변경할 수 있습니다.',
+    'storyInput.fileUpload.length': '업로드된 텍스트 길이:',
+    'storyInput.fileUpload.error': '텍스트 파일(.txt)만 업로드 가능합니다.',
+    'storyInput.fileUpload.readError': '파일 읽기 중 오류가 발생했습니다.',
+    'storyEditor.title': '스토리 편집',
     'storyEditor.imageGenerationGuide': '이미지 생성 가이드',
     'storyEditor.imageGenerationGuide.placeholder': '이미지 생성 시 공통적으로 적용할 가이드를 입력하세요...',
     'storyEditor.imageGenerationGuide.example': '예: 말 풍선 생성 금지, 텍스트 포함하지 않기 등',
@@ -83,7 +131,14 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'titleRecommender.cancel': '취소',
     'titleRecommender.decide': '이 제목으로 결정',
     'titleRecommender.regenerate': '다른 제목 추천받기',
+    'titleRecommender.currentTitle': '현재 선택된 제목:',
+    'titleRecommender.selected': '선택됨',
+    'titleRecommender.editing': '제목 수정',
+    'titleRecommender.prompt': '스토리 제목을 추천받으시겠습니까?',
     'imageGenerator.title': '이미지 생성',
+    'imageGenerator.remainingCount': '남은 생성 횟수:',
+    'imageGenerator.model': '사용 모델:',
+    'imageGenerator.imageGenerated': '이미지 생성됨',
     'imageGenerator.imageList': '이미지 목록 (1:1 비율)',
     'imageGenerator.textList': '스토리 텍스트 목록',
     'imageGenerator.selectCover': '표지 선택',
@@ -100,6 +155,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'preview.next': '다음',
     'preview.cover': '표지',
     'preview.story': '스토리',
+    'preview.storyNumber': '스토리 #',
     'footer.education': 'Story Bringer: 크리에이터 교육 목적의 기능 제한 버전',
     'footer.techStack': '기술 스택: React, Vite, TypeScript, Tailwind CSS, OpenAI GPT API, Google Gemini API, jsPDF, html2canvas, axios, react-router-dom',
     'footer.developer': '개발자 정보: JUN / naebon@naver.com / www.nextplatform.net',
@@ -125,6 +181,26 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'settings.language.ja': 'Japanese',
     'storyInput.title': 'Story Input',
     'storyInput.submit': 'Generate Story',
+    'storyInput.storyLine': 'Story Line',
+    'storyInput.storyLine.placeholder': 'Please enter the main content of the story...',
+    'storyInput.characters': 'Characters',
+    'storyInput.characters.placeholder': 'Describe the main characters and their characteristics...',
+    'storyInput.similarWorks': 'Similar Works',
+    'storyInput.similarWorks.placeholder': 'Enter works or styles you would like to reference...',
+    'storyInput.genre': 'Genre',
+    'storyInput.designStyle': 'Design Style',
+    'storyInput.artist': 'Artist (Optional)',
+    'storyInput.artist.placeholder': 'Artist style you would like to reference...',
+    'storyInput.director': 'Director (Optional)',
+    'storyInput.director.placeholder': 'Director style you would like to reference...',
+    'storyInput.generating': 'Generating Story...',
+    'storyInput.fileUpload': 'Text File Upload (Optional)',
+    'storyInput.fileUpload.dragDrop': 'Drag and drop a text file or click to upload',
+    'storyInput.fileUpload.uploaded': 'File uploaded. Click to change to another file.',
+    'storyInput.fileUpload.length': 'Uploaded text length:',
+    'storyInput.fileUpload.error': 'Only text files (.txt) can be uploaded.',
+    'storyInput.fileUpload.readError': 'An error occurred while reading the file.',
+    'storyEditor.title': 'Story Edit',
     'storyEditor.imageGenerationGuide': 'Image Generation Guide',
     'storyEditor.imageGenerationGuide.placeholder': 'Enter a guide to be applied to all image generation...',
     'storyEditor.imageGenerationGuide.example': 'Example: No speech bubbles, Do not include text, etc.',
@@ -136,7 +212,14 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'titleRecommender.cancel': 'Cancel',
     'titleRecommender.decide': 'Decide on This Title',
     'titleRecommender.regenerate': 'Get Other Recommendations',
+    'titleRecommender.currentTitle': 'Currently Selected Title:',
+    'titleRecommender.selected': 'Selected',
+    'titleRecommender.editing': 'Edit Title',
+    'titleRecommender.prompt': 'Would you like to get title recommendations for your story?',
     'imageGenerator.title': 'Image Generation',
+    'imageGenerator.remainingCount': 'Remaining Generations:',
+    'imageGenerator.model': 'Model Used:',
+    'imageGenerator.imageGenerated': 'Image Generated',
     'imageGenerator.imageList': 'Image List (1:1 Ratio)',
     'imageGenerator.textList': 'Story Text List',
     'imageGenerator.selectCover': 'Select Cover',
@@ -153,6 +236,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'preview.next': 'Next',
     'preview.cover': 'Cover',
     'preview.story': 'Story',
+    'preview.storyNumber': 'Story #',
     'footer.education': 'Story Bringer: Feature-limited version for creator education purposes',
     'footer.techStack': 'Tech Stack: React, Vite, TypeScript, Tailwind CSS, OpenAI GPT API, Google Gemini API, jsPDF, html2canvas, axios, react-router-dom',
     'footer.developer': 'Developer Info: JUN / naebon@naver.com / www.nextplatform.net',
@@ -178,6 +262,26 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'settings.language.ja': '日本語',
     'storyInput.title': 'ストーリー入力',
     'storyInput.submit': 'ストーリー生成',
+    'storyInput.storyLine': 'ストーリーライン',
+    'storyInput.storyLine.placeholder': 'ストーリーの主要内容を入力してください...',
+    'storyInput.characters': '登場人物',
+    'storyInput.characters.placeholder': '主要な登場人物とその特徴を説明してください...',
+    'storyInput.similarWorks': '類似作品',
+    'storyInput.similarWorks.placeholder': '参考にしたい作品やスタイルを入力してください...',
+    'storyInput.genre': 'ジャンル',
+    'storyInput.designStyle': 'デザインスタイル',
+    'storyInput.artist': 'アーティスト (任意)',
+    'storyInput.artist.placeholder': '参考にしたいアーティストスタイル...',
+    'storyInput.director': 'ディレクター (任意)',
+    'storyInput.director.placeholder': '参考にしたいディレクタースタイル...',
+    'storyInput.generating': 'ストーリー生成中...',
+    'storyInput.fileUpload': 'テキストファイルアップロード (任意)',
+    'storyInput.fileUpload.dragDrop': 'テキストファイルをドラッグ&ドロップするか、クリックしてアップロードしてください',
+    'storyInput.fileUpload.uploaded': 'ファイルがアップロードされました。クリックして別のファイルに変更できます。',
+    'storyInput.fileUpload.length': 'アップロードされたテキストの長さ:',
+    'storyInput.fileUpload.error': 'テキストファイル(.txt)のみアップロード可能です。',
+    'storyInput.fileUpload.readError': 'ファイル読み込み中にエラーが発生しました。',
+    'storyEditor.title': 'ストーリー編集',
     'storyEditor.imageGenerationGuide': '画像生成ガイド',
     'storyEditor.imageGenerationGuide.placeholder': 'すべての画像生成に適用するガイドを入力してください...',
     'storyEditor.imageGenerationGuide.example': '例: 吹き出しを作成しない、テキストを含めないなど',
@@ -189,7 +293,14 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'titleRecommender.cancel': 'キャンセル',
     'titleRecommender.decide': 'このタイトルで決定',
     'titleRecommender.regenerate': '他の推薦を受ける',
+    'titleRecommender.currentTitle': '現在選択されているタイトル:',
+    'titleRecommender.selected': '選択済み',
+    'titleRecommender.editing': 'タイトル編集',
+    'titleRecommender.prompt': 'ストーリーのタイトル推薦を受けますか？',
     'imageGenerator.title': '画像生成',
+    'imageGenerator.remainingCount': '残り生成回数:',
+    'imageGenerator.model': '使用モデル:',
+    'imageGenerator.imageGenerated': '画像生成済み',
     'imageGenerator.imageList': '画像リスト (1:1比率)',
     'imageGenerator.textList': 'ストーリーテキストリスト',
     'imageGenerator.selectCover': '表紙選択',
@@ -206,6 +317,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     'preview.next': '次へ',
     'preview.cover': '表紙',
     'preview.story': 'ストーリー',
+    'preview.storyNumber': 'ストーリー #',
     'footer.education': 'Story Bringer: クリエイター教育目的の機能制限版',
     'footer.techStack': '技術スタック: React, Vite, TypeScript, Tailwind CSS, OpenAI GPT API, Google Gemini API, jsPDF, html2canvas, axios, react-router-dom',
     'footer.developer': '開発者情報: JUN / naebon@naver.com / www.nextplatform.net',
