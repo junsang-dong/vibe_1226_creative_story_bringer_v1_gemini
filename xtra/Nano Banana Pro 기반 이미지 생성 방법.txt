@@ -1,0 +1,138 @@
+#Nano Banana Pro 기반 이미지 생성 방법
+
+**"Nano Banana Pro"**는 2025년 12월 현재, 구글의 최신 이미지 생성 모델인 Gemini 3 Pro Image (또는 이와 연동된 gemini-3-pro-image-preview)를 지칭하는 커뮤니티 혹은 개발자들 사이의 애칭(또는 코드네임)으로 파악됩니다.
+
+이 모델은 이전 세대보다 "캐릭터 일관성(Character Consistency)" 유지 능력이 획기적으로 향상된 것이 핵심입니다.[1] 웹앱에서 수십 장의 일관된 이미지를 생성하기 위해 이 기능을 실용적으로 적용하는 기술적 방법을 정리해 드립니다.
+
+##1. 핵심 기술: Nano Banana Pro (Gemini 3 Pro Image) 이해
+
+단순히 프롬프트만으로 일관성을 유지하는 것은 한계가 있습니다. 최신 Gemini API(Vertex AI)는 "Subject Reference(피사체 참조)" 또는 "Character Consistency" 기능을 지원합니다.
+- 모델명: gemini-3-pro-image-preview (API 호출 시 사용)
+- 특징: 텍스트 프롬프트 외에 **'기준 이미지(Reference Image)'**를 입력으로 받아, 해당 피사체의 외형(얼굴, 복장 등)을 유지하면서 동작이나 배경만 바꿀 수 있습니다.[2]
+
+
+##2. 웹앱 아키텍처 및 워크플로우
+
+웹앱 클라이언트에서 직접 API 키를 노출하지 않도록 반드시 **서버(Backend)**를 경유해야 합니다.
+
+Flow: [사용자/클라이언트] → [내 서버 (Node.js/Python)] → [Google Vertex AI / Gemini API]
+
+구현 3단계 전략
+- Anchor Image 생성 (캐릭터 원형 만들기): 최초의 완벽한 캐릭터 이미지를 1장 생성합니다.
+- Reference ID/Embedding 추출: 생성된 이미지를 '기준점(Anchor)'으로 설정합니다.
+- Variation 생성 (일관성 유지): 기준 이미지를 파라미터로 넣어 동작만 다른 수십 장의 이미지를 생성합니다.
+
+
+##3. 기술적 구현 (Python SDK 예시)
+
+최신 google-genai 라이브러리(v1.40 이상 권장)를 사용합니다.[3]
+
+사전 준비
+code
+Bash
+pip install -U google-genai
+
+[4]
+Backend 코드 (Python)
+"Nano Banana Pro" 기능을 활용해 일관성을 유지하는 핵심 코드는 reference_images 파라미터를 사용하는 것입니다.
+
+code
+Python
+from google import genai
+from google.genai import types
+import base64
+
+# 1. 클라이언트 초기화 (Vertex AI 또는 AI Studio)
+client = genai.Client(
+    location="us-central1",  # Gemini 3 Pro Image 지원 리전 확인 필요
+    project="your-gcp-project-id"
+)
+
+def generate_consistent_images(prompt, reference_image_path=None):
+    """
+    reference_image_path가 있으면 해당 캐릭터의 일관성을 유지하며 생성,
+    없으면 새로운 캐릭터(Anchor)를 생성.
+    """
+    
+    model_name = "gemini-3-pro-image-preview" # Nano Banana Pro 대응 모델
+    
+    generation_config = types.GenerateImageConfig(
+        number_of_images=1,
+        aspect_ratio="1:1",
+        include_rai_reason=True,
+        output_mime_type="image/jpeg"
+    )
+
+    # 2. 참조 이미지 설정 (일관성 핵심)
+    if reference_image_path:
+        with open(reference_image_path, "rb") as f:
+            ref_img_bytes = f.read()
+            
+        # 최신 API에서는 reference_images 또는 subject_reference 파라미터 사용
+        # (SDK 버전에 따라 파라미터명이 상이할 수 있으니 최신 문서를 참고해야 함)
+        generation_config.reference_images = [
+            types.Image(image_bytes=ref_img_bytes)
+        ]
+        # 프롬프트에 참조 지시 추가
+        final_prompt = f"{prompt}. Keep the character consistent with the reference image."
+    else:
+        final_prompt = prompt
+
+    # 3. 이미지 생성 요청
+    response = client.models.generate_image(
+        model=model_name,
+        prompt=final_prompt,
+        config=generation_config
+    )
+
+    if response.generated_images:
+        return response.generated_images[0].image.image_bytes
+    else:
+        raise Exception("이미지 생성 실패")
+
+# --- 사용 예시 ---
+
+# 1단계: 기준 캐릭터 생성 (Anchor)
+anchor_prompt = "A cute 3D avatar of a futuristic pilot with blue hair, wearing a silver spacesuit, studio lighting, 4k"
+anchor_image = generate_consistent_images(anchor_prompt)
+with open("character_anchor.jpg", "wb") as f:
+    f.write(anchor_image)
+print("기준 캐릭터 생성 완료")
+
+# 2단계: 동작 변경 (일관성 유지)
+# 기준 이미지를 넣어주면 얼굴/복장은 유지하되 동작만 바뀜
+action_prompt = "The same character running on Mars surface, dynamic pose"
+variant_image = generate_consistent_images(action_prompt, reference_image_path="character_anchor.jpg")
+with open("character_running.jpg", "wb") as f:
+    f.write(variant_image)
+print("동작 변경 이미지 생성 완료")
+
+
+##4. 실용적인 팁 (Pro Tips)
+
+1) 프롬프트 엔지니어링 (Persona Injection):
+참조 이미지를 쓰더라도 텍스트 프롬프트에 캐릭터의 핵심 특징을 고정된 문자열로 계속 넣어주세요.
+Bad: "Running"[6]
+Good: "[System] A futuristic pilot with blue hair and silver suit. [User] Running on Mars."
+백엔드에서 프롬프트를 조립할 때 Base Description + Action Description 형태로 결합하는 것이 일관성에 유리합니다.
+
+2) 시드(Seed) 고정의 한계와 대안:
+과거에는 Seed를 고정하여 일관성을 얻으려 했으나, 복잡한 포즈 변화 시에는 효과가 떨어집니다. Gemini 3 Pro Image의 Subject Reference 기능이 훨씬 강력하므로 이를 주력으로 사용하세요.
+
+3) 웹앱 UX 설계:
+사용자에게 먼저 **"캐릭터 시트(Character Sheet)"**를 생성하게 하세요.[3] (정면, 측면이 포함된 이미지)
+사용자가 "이 캐릭터로 결정"을 누르면, 해당 이미지를 서버에 임시 저장하고 이후 생성 요청 시마다 reference_image로 전송하세요.
+
+4) 비용 관리 (Quota):
+Nano Banana Pro(Gemini 3 Pro) 모델은 고성능이므로 호출 비용이 발생할 수 있습니다. 개발 단계에서는 gemini-2.5-flash-image (Nano Banana)로 프롬프트를 테스트하고, 최종 결과물 생성 시에만 Pro 모델을 호출하도록 로직을 분기하세요.
+
+이 방식이 2025년 현재 구글 클라우드 환경에서 가장 확실하게 일관된 이미지를 생성하는 "Standard Pattern"입니다.
+
+Sources
+help
+ppc.land
+google.com
+towardsdatascience.com
+datacamp.com
+raymondcamden.com
+google.com
